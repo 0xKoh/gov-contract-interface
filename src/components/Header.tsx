@@ -6,16 +6,19 @@ import { Image, Button } from '@chakra-ui/react'
 const Header = (props: {method: () => void}) => {
 
   return (
-    <>
+    <div id='header'>
         <Image
+          className='p-3'
           w='10%'
-          src='/vercel.svg'
+          src='/logo.jpg'
           alt='DApp Logo'
         />
-        <Web3Button />
-        <Web3NetworkSwitch />
-        <Button onClick={() => props.method()}>Switcing Theme</Button>
-    </>
+        <div className='p-3'>
+          <Web3Button />
+          <Web3NetworkSwitch />
+        </div>
+        <Button p={3} onClick={() => props.method()}>Switcing Theme</Button>
+    </div>
   )
 }
 

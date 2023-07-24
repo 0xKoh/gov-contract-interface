@@ -1,23 +1,51 @@
 'use client'
 import Header from '../components/Header'
-import { Button } from '@chakra-ui/react'
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider, Button, Text } from '@chakra-ui/react'
 import { useState } from 'react'
 import { EthereumClient, w3mConnectors, w3mProvider } from '@web3modal/ethereum'
-import { Web3Modal, Web3NetworkSwitch } from '@web3modal/react'
-import { configureChains, createConfig, WagmiConfig } from 'wagmi'
+import { Web3Modal } from '@web3modal/react'
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { configureChains, createConfig, WagmiConfig, useAccount, useConnect } from 'wagmi'
+import { publicProvider } from 'wagmi/providers/public'
 import { goerli, mainnet, polygon, polygonMumbai } from 'wagmi/chains'
 
 export default function Home() {
-  const chains = [mainnet, polygon, polygonMumbai, goerli]
+
   const projectId = 'a803890315e1cc6a1c49447900640e7e'
 
+  // wagmi
+  const chains = [mainnet, polygon, polygonMumbai, goerli]
   const { publicClient } = configureChains(chains, [w3mProvider({ projectId })])
+  // const { publicClient1 } = configureChains(chains, [publicProvider()])
+
+  const connector = new MetaMaskConnector({
+    chains: chains,
+    options: {
+      shimDisconnect: true
+    }
+  })
+
+  const WalletConnect = w3mConnectors({ projectId, chains })
+
   const wagmiConfig = createConfig({
     autoConnect: true,
-    connectors: w3mConnectors({ projectId, chains }),
+    connectors: [
+      new WalletConnectConnector({
+        chains: chains,
+        options: {
+          projectId: projectId
+        }
+      }),
+      connector
+    ],
     publicClient
   })
+
+  const { address, isConnecting } = useAccount()
+  const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
+
+  // WalletConnect
   const ethereumClient = new EthereumClient(wagmiConfig, chains)
 
   const [theme, setTheme] = useState<"light" | "dark">("light")
@@ -34,14 +62,18 @@ export default function Home() {
     <html lang='ja'>
     <ChakraProvider>
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+        <div className="w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex p-4">
         <Header method={() => toggleTheme()}/>
+        <Text>Gov Contract</Text>
         <WagmiConfig config={wagmiConfig}>
+          <Button onClick={() => connect({connector})} >
+            <Text>{address}</Text>
+          </Button>
           <Web3Modal
             projectId={projectId}
             ethereumClient={ethereumClient}
             themeMode={theme}
-            themeVariables={{ '--w3m-accent-color': 'Black', '--w3m-logo-image-url': 'https://asset.watch.impress.co.jp/img/avw/docs/1189/762/k01_s.jpg' }}
+            themeVariables={{ '--w3m-accent-color': theme, '--w3m-logo-image-url': 'https://asset.watch.impress.co.jp/img/avw/docs/1189/762/k01_s.jpg' }}
           />
         </WagmiConfig>
         </div>

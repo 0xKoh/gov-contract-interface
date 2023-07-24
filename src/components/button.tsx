@@ -6,6 +6,6 @@ import { useAccount } from 'wagmi'
 export default function Button() {
 
   return (
-    <Web3Button avatar='hide'/>
+    <Web3Button />
   )
 }
