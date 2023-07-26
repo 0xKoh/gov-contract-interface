@@ -1,12 +1,15 @@
 'use client'
 import { useState } from 'react'
-import { Web3Button, Web3NetworkSwitch } from '@web3modal/react'
-import { Image, Button } from '@chakra-ui/react'
+import { useWeb3Modal } from '@web3modal/react'
+import { Image, Button, Text } from '@chakra-ui/react'
+import { useAccount } from 'wagmi'
+import ConnectWallet from '../components/ConnectWallet'
 
 const Header = (props: {method: () => void}) => {
-
+  const { address, isConnecting, isDisconnected } = useAccount()
+  const { open, close } = useWeb3Modal()
   return (
-    <div id='header'>
+    <div className='flex items-center justify-center m-10'>
         <Image
           className='p-3'
           w='10%'
@@ -14,10 +17,10 @@ const Header = (props: {method: () => void}) => {
           alt='DApp Logo'
         />
         <div className='p-3'>
-          <Web3Button />
-          <Web3NetworkSwitch />
+          <ConnectWallet />
+          <Button p={3} onClick={() => props.method()}>Switcing Theme</Button>
+          <Text>{address}</Text>
         </div>
-        <Button p={3} onClick={() => props.method()}>Switcing Theme</Button>
     </div>
   )
 }

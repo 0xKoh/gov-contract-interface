@@ -1,6 +1,7 @@
 'use client'
 import Header from '../components/Header'
-import { ChakraProvider, Button, Text } from '@chakra-ui/react'
+import Footer from '../components/Footer'
+import { ChakraProvider, Button, Text, extendTheme } from '@chakra-ui/react'
 import { useState } from 'react'
 import { EthereumClient, w3mConnectors, w3mProvider } from '@web3modal/ethereum'
 import { Web3Modal } from '@web3modal/react'
@@ -42,9 +43,6 @@ export default function Home() {
     publicClient
   })
 
-  const { address, isConnecting } = useAccount()
-  const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
-
   // WalletConnect
   const ethereumClient = new EthereumClient(wagmiConfig, chains)
 
@@ -59,26 +57,22 @@ export default function Home() {
   }
 
   return (
-    <html lang='ja'>
     <ChakraProvider>
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <div className="w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex p-4">
+      <WagmiConfig config={wagmiConfig}>
+        <Web3Modal
+              projectId={projectId}
+              ethereumClient={ethereumClient}
+              themeMode={theme}
+              themeVariables={{ '--w3m-accent-color': theme, '--w3m-logo-image-url': 'https://asset.watch.impress.co.jp/img/avw/docs/1189/762/k01_s.jpg' }}
+            />
         <Header method={() => toggleTheme()}/>
-        <Text>Gov Contract</Text>
-        <WagmiConfig config={wagmiConfig}>
-          <Button onClick={() => connect({connector})} >
-            <Text>{address}</Text>
-          </Button>
-          <Web3Modal
-            projectId={projectId}
-            ethereumClient={ethereumClient}
-            themeMode={theme}
-            themeVariables={{ '--w3m-accent-color': theme, '--w3m-logo-image-url': 'https://asset.watch.impress.co.jp/img/avw/docs/1189/762/k01_s.jpg' }}
-          />
-        </WagmiConfig>
-        </div>
-      </main>
+        <main className="flex min-h-screen flex-col items-center justify-between p-24">
+          <div className="w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex p-4 flex">
+            <Text>Gov Contract</Text>
+          </div>
+        </main>
+        <Footer />
+      </WagmiConfig>
     </ChakraProvider>
-    </html>
   )
 }
