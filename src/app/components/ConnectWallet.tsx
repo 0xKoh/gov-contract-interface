@@ -4,19 +4,28 @@ import { Button } from '@chakra-ui/react'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 
 const ConnectWallet = () => {
-    const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
+    const { connect, connectors } = useConnect()
     const { disconnect, status } = useDisconnect()
-    const { isConnecting, isDisconnected } = useAccount()
+    const { isConnecting, isConnected } = useAccount()
     
-    return(
+    if(!isConnected) return(
         <>
             {connectors.map((connector) => (
-                <Button 
+                <Button m={1}
                     onClick={() => connect({ connector })} 
                     key={connector.id}
                     isLoading={isConnecting}
                 >{connector.name}</Button>
             ))}
+        </>
+    )
+
+    if(isConnected) return (
+        <>
+            <Button 
+                m={1}
+                onClick={() => disconnect()}
+            >Disconnect</Button>
         </>
     )
 }
